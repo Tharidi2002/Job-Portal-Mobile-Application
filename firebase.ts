@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth"
 import { getFirestore } from "firebase/firestore"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAeiZ-838gDATVqV5ykyCpevaWXkBMJqaM",
-  authDomain: "task-manager-ead57.firebaseapp.com",
-  projectId: "task-manager-ead57",
-  storageBucket: "task-manager-ead57.firebasestorage.app",
-  messagingSenderId: "544806961634",
-  appId: "1:544806961634:web:a8ec18ef16a718c84579bb"
+  apiKey: "AIzaSyANESDezo-4Er-23mJpLSmgK3wrNnwZu-Q",
+  authDomain: "task-manager-57eb8.firebaseapp.com",
+  projectId: "task-manager-57eb8",
+  storageBucket: "task-manager-57eb8.firebasestorage.app",
+  messagingSenderId: "673831569434",
+  appId: "1:673831569434:web:560ef2c1d33fe2aac869a3"
 }
 
 const app = initializeApp(firebaseConfig)
