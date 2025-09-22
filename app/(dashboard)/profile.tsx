@@ -24,7 +24,6 @@ export default function CompanyProfileScreen() {
   const { user, signOut } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   // Company fields
   const [companyName, setCompanyName] = useState("");
