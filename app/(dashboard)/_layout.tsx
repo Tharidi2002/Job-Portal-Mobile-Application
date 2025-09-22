@@ -13,11 +13,7 @@ const DashboardLayout = () => {
   const { colors } = useTheme();
   const router = useRouter();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading]);
+  // Removed login redirect so dashboard always shows
 
   // Initialize notifications when user is logged in
   useEffect(() => {
@@ -85,6 +81,10 @@ const DashboardLayout = () => {
             paddingTop: 8,
             paddingBottom: 8,
             height: 70,
+            elevation: 10,
+            shadowColor: '#000',
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
           },
           tabBarLabelStyle: {
             fontSize: 12,
@@ -97,25 +97,44 @@ const DashboardLayout = () => {
           name="home"
           options={{
             title: "Home",
-            tabBarIcon: ({ focused, size, color }) => (
-              <MaterialIcons
-                name="home"
-                size={size}
-                color={color}
-              />
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="home" size={size} color={color} />
             ),
           }}
         />
         <Tabs.Screen
-          name="companies"
+          name="meals"
           options={{
-            title: "Companies",
-            tabBarIcon: ({ focused, size, color }) => (
-              <MaterialIcons
-                name="business"
-                size={size}
-                color={color}
-              />
+            title: "Meals",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="restaurant-menu" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="favourites"
+          options={{
+            title: "Favourites",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="favorite" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="plan"
+          options={{
+            title: "Plan",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="event-note" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="person" size={size} color={color} />
             ),
           }}
         />
@@ -123,12 +142,8 @@ const DashboardLayout = () => {
           name="settings"
           options={{
             title: "Settings",
-            tabBarIcon: ({ focused, size, color }) => (
-              <MaterialIcons
-                name="settings"
-                size={size}
-                color={color}
-              />
+            tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="settings" size={size} color={color} />
             ),
           }}
         />

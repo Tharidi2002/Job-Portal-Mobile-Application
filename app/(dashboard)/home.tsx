@@ -11,7 +11,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
-import { getJobs, Job } from "../../../services/jobService";
+import { getJobs, Job } from "../../services/jobService";
 
 export default function HomeScreen() {
   const { colors } = useTheme();
