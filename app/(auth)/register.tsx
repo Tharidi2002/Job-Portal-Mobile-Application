@@ -1,87 +1,201 @@
+import { register } from "@/services/authService";
+import { createUserProfile } from "@/services/userService";
+import { useRouter } from "expo-router";
+import React from "react";
 import {
-  View,
-  Text,
+  ActivityIndicator,
+  Alert,
+  Image,
   Pressable,
+  Text,
   TextInput,
   TouchableOpacity,
-  Alert,
-  ActivityIndicator
-} from "react-native"
-import React, { useState } from "react"
-import { useRouter } from "expo-router"
-import { register } from "@/services/authService"
+  View,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 const Register = () => {
-  const router = useRouter()
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
-  const [cPassword, setCPassword] = useState<string>("")
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const router = useRouter();
+  const [email, setEmail] = React.useState<string>("");
+  const [password, setPassword] = React.useState<string>("");
+  const [confirmPassword, setConfirmPassword] = React.useState<string>("");
+  const [companyName, setCompanyName] = React.useState<string>("");
+  const [logo, setLogo] = React.useState<string>("");
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  // Image picker handler
+  const pickLogo = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Please allow access to your photos.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setLogo(result.assets[0].uri);
+    }
+  };
 
   const handleRegister = async () => {
-    // if(email)
-    // password
-    if (isLoading) return
-    if (password !== cPassword) {
-      Alert.alert("Title", "description")
-      return
+    if (!email || !password || !confirmPassword || !companyName) {
+      alert("Please fill in all required fields");
+      return;
     }
-    setIsLoading(true)
-    await register(email, password)
-      .then((res) => {
-        // const res = await register(email, password)
-        // success
-        router.back()
-      })
-      .catch((err) => {
-        Alert.alert("Registration failed", "Somthing went wrong")
-        console.error(err)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const userCredential = await register(email, password);
+      const user = userCredential.user;
+      // Create company profile
+      await createUserProfile({
+        uid: user.uid,
+        email: user.email || email,
+        companyName,
+        logo: logo || "",
+        createdAt: new Date().toISOString(),
+      });
+      router.replace("/home");
+    } catch (err) {
+      alert("Registration Failed");
+      console.error("Registration Error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View className="flex-1 w-full justify-center align-items-center p-4">
-      <Text className="text-4xl text-center mb-2">Register</Text>
+      <Text className="text-4xl text-center">Company Registration</Text>
+      <Text className="text-lg text-center mb-4">Register your company account</Text>
+
+      <TouchableOpacity
+        className="bg-gray-200 p-4 rounded-lg shadow-lg mb-4 w-full items-center"
+        onPress={pickLogo}
+      >
+        {logo ? (
+          <Image
+            source={{ uri: logo }}
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              marginBottom: 8,
+            }}
+          />
+        ) : (
+          <View
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              backgroundColor: "#ccc",
+              justifyContent: "center",
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            <Text>Add Company Logo</Text>
+          </View>
+        )}
+        <Text className="text-center">
+          {logo ? "Change Logo" : "Select Company Logo"}
+        </Text>
+      </TouchableOpacity>
+
       <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        className="bg-surface border border-gray-300 rounded px-4 py-3 mb-4 text-gray-900"
+        placeholder="Company Name *"
+        placeholderTextColor="#999"
+        value={companyName}
+        onChangeText={setCompanyName}
+        style={{
+          padding: 16,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 8,
+          marginBottom: 16,
+          width: "100%",
+          fontSize: 16,
+          backgroundColor: "#fff",
+        }}
       />
       <TextInput
-        placeholder="Password"
+        placeholder="Email *"
+        placeholderTextColor="#999"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        style={{
+          padding: 16,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 8,
+          marginBottom: 16,
+          width: "100%",
+          fontSize: 16,
+          backgroundColor: "#fff",
+        }}
+      />
+      <TextInput
+        placeholder="Password *"
+        placeholderTextColor="#999"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        className="bg-surface border border-gray-300 rounded px-4 py-3 mb-4 text-gray-900"
+        style={{
+          padding: 16,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 8,
+          marginBottom: 16,
+          width: "100%",
+          fontSize: 16,
+          backgroundColor: "#fff",
+        }}
       />
       <TextInput
-        placeholder="Confirm password"
-        value={cPassword}
-        onChangeText={setCPassword}
+        placeholder="Confirm Password *"
+        placeholderTextColor="#999"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
         secureTextEntry
-        className="bg-surface border border-gray-300 rounded px-4 py-3 mb-4 text-gray-900"
+        style={{
+          padding: 16,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 8,
+          marginBottom: 16,
+          width: "100%",
+          fontSize: 16,
+          backgroundColor: "#fff",
+        }}
       />
       <TouchableOpacity
+        className="bg-blue-500 p-4 rounded-lg shadow-lg mt-4 w-full"
         onPress={handleRegister}
-        className="bg-green-600 p-4 rounded mt-2"
+        disabled={isLoading}
       >
         {isLoading ? (
-          <ActivityIndicator color="#fff" size="large" />
+          <ActivityIndicator size="small" color="#ffffff" />
         ) : (
-          <Text className="text-center text-2xl">Register</Text>
+          <Text className="text-lg text-center text-white">Register</Text>
         )}
       </TouchableOpacity>
-      <Pressable className="px-6 py-3" onPress={() => router.back()}>
-        <Text className="text-xl text-center text-blue-500">
-          Alrady have an account? Login
-        </Text>
+
+      <Text className="text-center mt-4">Already have an account?</Text>
+      <Pressable
+        className="bg-green-500 p-4 rounded-lg shadow-lg w-full mt-2"
+        onPress={() => router.push("/login")}
+      >
+        <Text className="text-lg text-white text-center">Go to Login</Text>
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

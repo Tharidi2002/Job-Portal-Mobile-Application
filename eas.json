@@ -1,0 +1,66 @@
+{
+  "cli": {
+    "version": ">= 16.18.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "image": "ubuntu-22.04-jdk-17-ndk-r25b"
+      },
+      "node": "20.15.1",
+      "env": {
+        "EXPO_NO_CAPABILITY_SYNC": "1",
+        "EAS_BUILD": "true",
+        "DISABLE_METRO_TRANSFORMER": "true"
+      },
+      "cache": {
+        "key": "production-build-v6"
+      }
+    },
+    "android-java17": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "image": "ubuntu-22.04-jdk-17-ndk-r25b"
+      },
+      "cache": {
+        "key": "eas-build-android-java17-v6"
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "JAVA_VERSION": "17",
+        "EAS_BUILD": "true",
+        "DISABLE_METRO_TRANSFORMER": "true"
+      },
+      "node": "20.15.1"
+    },
+    "no-tailwind": {
+      "extends": "production",
+      "prebuildCommand": "node -e \"const fs=require('fs');const p='./metro.config.js';let c=fs.readFileSync(p,'utf8');c=c.replace(/nativewind[\\s\\S]*?\\.config/g,'() => ({})');fs.writeFileSync(p,c);console.log('Disabled NativeWind in metro config');\"",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "env": {
+        "DISABLE_TAILWIND": "true",
+        "EAS_BUILD": "true",
+        "DISABLE_METRO_TRANSFORMER": "true"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

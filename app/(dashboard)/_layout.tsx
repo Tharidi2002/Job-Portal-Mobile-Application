@@ -1,96 +1,140 @@
-import { View, Text, SafeAreaView, ActivityIndicator } from "react-native"
-import React, { useEffect } from "react"
-import { Slot, Tabs, useRouter } from "expo-router"
-import { MaterialIcons } from "@expo/vector-icons"
-import { useAuth } from "@/context/AuthContext"
+import { View, SafeAreaView, ActivityIndicator } from "react-native";
+import React, { useEffect } from "react";
+import { Tabs, useRouter } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import NotificationService from "@/services/notificationService";
+// import job-related services as needed
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DashboardLayout = () => {
-  const { user, loading } = useAuth()
-  const router = useRouter()
-  console.log("User Data :", user)
+  const { user, loading } = useAuth();
+  const { colors } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [user, loading])
+  }, [user, loading]);
+
+  // Initialize notifications when user is logged in
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      if (user) {
+        // Initialize notification service
+        await NotificationService.initialize();
+
+        // Set up notification response listener
+        const subscription =
+          NotificationService.setupNotificationResponseListener();
+
+  // Job portal: schedule job-related notifications if needed
+
+        // Schedule meal planning reminders
+        try {
+          const storedSettings = await AsyncStorage.getItem(
+            "notification_settings"
+          );
+          const settings = storedSettings
+            ? JSON.parse(storedSettings)
+            : { enabled: true, planningReminders: true };
+
+          if (settings.enabled && settings.planningReminders) {
+            // await NotificationService.scheduleJobReminders();
+            console.log("Scheduled meal planning reminders on app start");
+          }
+        } catch (error) {
+          console.error("Error scheduling meal planning reminders:", error);
+        }
+
+        return () => subscription.remove();
+      }
+    };
+
+    initializeNotifications();
+  }, [user]);
 
   if (loading) {
     return (
-      <View className="flex-1 w-full justify-center align-items-center">
-        <ActivityIndicator size="large" />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
-    )
+    );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#2ecc71",
-          tabBarInactiveTintColor: "#2c3e50",
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textSecondary,
           tabBarStyle: {
-            backgroundColor: "#bdc3c7"
-          }
+            backgroundColor: colors.card,
+            borderTopColor: colors.border,
+            borderTopWidth: 1,
+            paddingTop: 8,
+            paddingBottom: 8,
+            height: 70,
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: "600",
+            marginTop: 4,
+          },
         }}
       >
         <Tabs.Screen
           name="home"
           options={{
             title: "Home",
-            tabBarIcon: (data) => (
+            tabBarIcon: ({ focused, size, color }) => (
               <MaterialIcons
-                name="home-filled"
-                size={data.size}
-                color={data.color}
+                name="home"
+                size={size}
+                color={color}
               />
-            )
+            ),
           }}
         />
         <Tabs.Screen
-          name="tasks"
-          // name="tasks/index"
+          name="companies"
           options={{
-            title: "Task",
-            tabBarIcon: (data) => (
+            title: "Companies",
+            tabBarIcon: ({ focused, size, color }) => (
               <MaterialIcons
-                name="check-circle"
-                size={data.size}
-                color={data.color}
+                name="business"
+                size={size}
+                color={color}
               />
-            )
+            ),
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="settings"
           options={{
-            title: "Profile",
-            tabBarIcon: (data) => (
-              <MaterialIcons
-                name="person"
-                size={data.size}
-                color={data.color}
-              />
-            )
-          }}
-        />
-        <Tabs.Screen
-          name="setting"
-          options={{
-            title: "Setting",
-            tabBarIcon: (data) => (
+            title: "Settings",
+            tabBarIcon: ({ focused, size, color }) => (
               <MaterialIcons
                 name="settings"
-                size={data.size}
-                color={data.color}
+                size={size}
+                color={color}
               />
-            )
+            ),
           }}
         />
       </Tabs>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;
