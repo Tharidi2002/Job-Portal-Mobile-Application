@@ -1,3 +1,8 @@
+// Get all registered companies
+export const getAllCompanies = async (): Promise<UserProfile[]> => {
+  const snapshot = await getDocs(userColRef);
+  return snapshot.docs.map((doc) => doc.data() as UserProfile);
+};
 import { db } from "../firebase";
 import {
   collection,

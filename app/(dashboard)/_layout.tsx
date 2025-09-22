@@ -1,6 +1,7 @@
-import { View, SafeAreaView, ActivityIndicator } from "react-native";
+import { View, SafeAreaView, ActivityIndicator, Dimensions } from "react-native";
+import BurgerMenu from "../../components/BurgerMenu";
 import React, { useEffect } from "react";
-import { Tabs, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -9,9 +10,10 @@ import NotificationService from "@/services/notificationService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DashboardLayout = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { colors } = useTheme();
   const router = useRouter();
+  const { width } = Dimensions.get('window');
 
   // Removed login redirect so dashboard always shows
 
@@ -69,85 +71,17 @@ const DashboardLayout = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: colors.textSecondary,
-          tabBarStyle: {
-            backgroundColor: colors.card,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-            paddingTop: 8,
-            paddingBottom: 8,
-            height: 70,
-            elevation: 10,
-            shadowColor: '#000',
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: "600",
-            marginTop: 4,
-          },
-        }}
-      >
-        <Tabs.Screen
-          name="home"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="home" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="meals"
-          options={{
-            title: "Meals",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="restaurant-menu" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="favourites"
-          options={{
-            title: "Favourites",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="favorite" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="plan"
-          options={{
-            title: "Plan",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="event-note" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: "Profile",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="person" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: "Settings",
-            tabBarIcon: ({ color, size }) => (
-              <MaterialIcons name="settings" size={size} color={color} />
-            ),
-          }}
-        />
-      </Tabs>
+      <BurgerMenu
+        title="Dashboard"
+        menuItems={[
+          { label: "Home", icon: "home", onPress: () => router.push("/(dashboard)/home") },
+          { label: "Profile", icon: "person", onPress: () => router.push("/(dashboard)/profile") },
+          { label: "Page", icon: "post-add", onPress: () => router.push("/(dashboard)/page") },
+          { label: "Settings", icon: "settings", onPress: () => router.push("/(dashboard)/settings") },
+          { label: "Logout", icon: "logout", onPress: async () => { try { await signOut(); router.replace("/(auth)/login"); } catch (e) {} } },
+        ]}
+      />
+      {/* Add children screens here if needed */}
     </SafeAreaView>
   );
 };

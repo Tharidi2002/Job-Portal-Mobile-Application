@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 import { getJobs, Job } from "../../services/jobService";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Dimensions, TouchableOpacity } from "react-native";
 
 const DashboardScreen = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { width } = Dimensions.get('window');
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -33,23 +35,35 @@ const DashboardScreen = () => {
         </TouchableOpacity>
         <Text style={styles.title}>All Jobs</Text>
       </View>
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu Overlay */}
       {menuOpen && (
-        <View style={styles.menu}>
-          <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); router.push("/about"); }}>
-            <MaterialIcons name="info" size={20} color="#222" />
-            <Text style={styles.menuText}>About</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); router.push("/(auth)/login"); }}>
-            <MaterialIcons name="login" size={20} color="#222" />
-            <Text style={styles.menuText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); router.push("/(auth)/register"); }}>
-            <MaterialIcons name="person-add" size={20} color="#222" />
-            <Text style={styles.menuText}>Register Company</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.08)', zIndex: 20, justifyContent: 'flex-start', alignItems: 'center' }}
+          activeOpacity={1}
+          onPress={() => setMenuOpen(false)}
+        >
+          <View style={{ marginTop: 70, width: width - 32, backgroundColor: "#fff", borderRadius: 12, elevation: 6, shadowColor: "#000", shadowOpacity: 0.13, shadowRadius: 12, paddingVertical: 8, zIndex: 30 }}>
+            <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 }} onPress={() => { setMenuOpen(false); router.push("/about"); }}>
+              <MaterialIcons name="info" size={20} color="#222" />
+              <Text style={{ marginLeft: 12, fontSize: 16, color: "#222" }}>About</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 }} onPress={() => { setMenuOpen(false); router.push("/(auth)/dashboard"); }}>
+              <MaterialIcons name="home" size={20} color="#222" />
+              <Text style={{ marginLeft: 12, fontSize: 16, color: "#222" }}>Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 }} onPress={() => { setMenuOpen(false); router.push("/(auth)/login"); }}>
+              <MaterialIcons name="login" size={20} color="#222" />
+              <Text style={{ marginLeft: 12, fontSize: 16, color: "#222" }}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       )}
+      {/* Description Bar */}
+      <View style={styles.descriptionBar}>
+        <Text style={styles.descriptionText}>
+          Welcome to JobGrid! Discover and explore job opportunities posted by top companies. Register your company to post jobs and manage your listings easily.
+        </Text>
+      </View>
       {/* Job List */}
       {loading ? (
         <View style={styles.centered}>
@@ -77,6 +91,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingTop: 40,
+  },
+  descriptionBar: {
+    backgroundColor: '#e0e7ff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#c7d2fe',
+  },
+  descriptionText: {
+    color: '#3730a3',
+    fontSize: 15,
+    textAlign: 'center',
+    fontWeight: '500',
   },
   topBar: {
     flexDirection: "row",

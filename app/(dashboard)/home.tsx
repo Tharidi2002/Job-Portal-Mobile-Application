@@ -6,30 +6,35 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
+  Image,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
 import { getJobs, Job } from "../../services/jobService";
+import { getAllCompanies, UserProfile } from "../../services/userService";
 
 export default function HomeScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const [jobListings, setJobListings] = useState<any[]>([]);
+  const [jobListings, setJobListings] = useState<Job[]>([]);
+  const [companies, setCompanies] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-
-  // Fetch job listings from jobService
+  // Fetch job listings and companies
   const loadData = async () => {
     setLoading(true);
     try {
       const jobs: Job[] = await getJobs();
+      const companyList: UserProfile[] = await getAllCompanies();
       setJobListings(jobs);
+      setCompanies(companyList);
     } catch (e) {
       setJobListings([]);
-      Alert.alert("Error", "Failed to load jobs");
+      setCompanies([]);
+      Alert.alert("Error", "Failed to load jobs or companies");
     }
     setLoading(false);
     setRefreshing(false);
@@ -38,6 +43,10 @@ export default function HomeScreen() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Helper to get company details for a job
+  const getCompany = (companyId: string) =>
+    companies.find((c) => c.uid === companyId);
 
   return (
     <ScrollView
@@ -57,43 +66,54 @@ export default function HomeScreen() {
             No jobs available.
           </Text>
         ) : (
-          jobListings.map((job) => (
-            <View
-              key={job.id}
-              style={{
-                backgroundColor: colors.card,
-                borderRadius: 10,
-                padding: 16,
-                marginTop: 16,
-                shadowColor: "#000",
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 2,
-              }}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
-                {job.title}
-              </Text>
-              <Text style={{ color: colors.text, marginTop: 4 }}>
-                {job.companyName || "Company"} • {job.location}
-              </Text>
-              <Text style={{ color: colors.text, marginTop: 8 }} numberOfLines={2}>
-                {job.description}
-              </Text>
-              <TouchableOpacity
+          jobListings.map((job) => {
+            const company = getCompany(job.companyId);
+            return (
+              <View
+                key={job.id}
                 style={{
-                  marginTop: 12,
-                  backgroundColor: colors.primary,
-                  padding: 10,
-                  borderRadius: 6,
-                  alignSelf: "flex-start",
+                  backgroundColor: colors.card,
+                  borderRadius: 10,
+                  padding: 16,
+                  marginTop: 16,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 2,
+                  flexDirection: "row",
+                  alignItems: "flex-start",
                 }}
-                onPress={() => router.push(`/(dashboard)/jobs/${job.id}`)}
               >
-                <Text style={{ color: "#fff" }}>View Details</Text>
-              </TouchableOpacity>
-            </View>
-          ))
+                <Image
+                  source={company?.logo ? { uri: company.logo } : require("../../assets/images/icon.png")}
+                  style={{ width: 48, height: 48, borderRadius: 24, marginRight: 14, backgroundColor: "#e0e7ff" }}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: colors.text }}>
+                    {job.title}
+                  </Text>
+                  <Text style={{ color: colors.text, marginTop: 2, fontWeight: "600" }}>
+                    {company?.companyName || "Company"} • {company?.location || job.location}
+                  </Text>
+                  <Text style={{ color: colors.text, marginTop: 6 }} numberOfLines={2}>
+                    {job.description}
+                  </Text>
+                  <TouchableOpacity
+                    style={{
+                      marginTop: 12,
+                      backgroundColor: colors.primary,
+                      padding: 10,
+                      borderRadius: 6,
+                      alignSelf: "flex-start",
+                    }}
+                    onPress={() => router.push(`/(dashboard)/jobs/${job.id}`)}
+                  >
+                    <Text style={{ color: "#fff" }}>View Details</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            );
+          })
         )}
       </View>
     </ScrollView>
