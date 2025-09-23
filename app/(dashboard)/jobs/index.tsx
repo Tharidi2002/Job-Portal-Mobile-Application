@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform } from "react-native";
 import { useTheme } from "../../../context/ThemeContext";
 import { useAuth } from "../../../context/AuthContext";
 import { getJobs, deleteJob, Job } from "../../../services/jobService";
@@ -16,7 +16,7 @@ export default function CompanyJobsScreen() {
     setLoading(true);
     try {
       const allJobs = await getJobs();
-  setJobs(allJobs.filter((j: Job) => j.companyId === user?.uid));
+      setJobs(allJobs.filter((j: Job) => j.companyId === user?.uid));
     } catch (e) {
       setJobs([]);
       Alert.alert("Error", "Failed to load jobs");
@@ -29,17 +29,32 @@ export default function CompanyJobsScreen() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    Alert.alert("Delete Job", "Are you sure you want to delete this job?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          await deleteJob(id);
-          loadJobs();
-        },
-      },
-    ]);
+    const deleteConfirmed = Platform.OS === 'web' 
+      ? window.confirm("Are you sure you want to delete this job?")
+      : await new Promise(resolve => {
+          Alert.alert(
+            "Delete Job",
+            "Are you sure you want to delete this job?",
+            [
+              { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: () => resolve(true),
+              },
+            ],
+            { cancelable: false }
+          );
+        });
+
+    if (deleteConfirmed) {
+      try {
+        await deleteJob(id);
+        loadJobs();
+      } catch (error) {
+        Alert.alert("Error", "Failed to delete job.");
+      }
+    }
   };
 
   return (
@@ -98,7 +113,7 @@ export default function CompanyJobsScreen() {
                     borderRadius: 6,
                     marginRight: 10,
                   }}
-                  onPress={() => router.push(`/(dashboard)/jobs/${job.id}`)}
+                  onPress={() => router.push(`/(dashboard)/jobs/edit?id=${job.id}`)}
                 >
                   <Text style={{ color: "#fff" }}>Edit</Text>
                 </TouchableOpacity>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Platform } from "react-native";
 import { useTheme } from "../../../context/ThemeContext";
 import { useAuth } from "../../../context/AuthContext";
-import { getJobById, updateJob, uploadImageToCloudinary, Job } from "../../../services/jobService";
+import { getJobById, updateJob, Job } from "../../../services/jobService";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function EditJobScreen() {
@@ -52,22 +52,50 @@ export default function EditJobScreen() {
       Alert.alert("Validation", "Title, description, and location are required.");
       return;
     }
-    setIsSaving(true);
-    try {
-      await updateJob(id as string, {
-        title,
-        description,
-        location,
-        salary,
-        image,
-      });
-      Alert.alert("Success", "Job updated successfully!", [
-        { text: "OK", onPress: () => router.replace("/(dashboard)/home") }
-      ]);
-    } catch (e) {
-      Alert.alert("Error", "Failed to update job");
+
+    const saveConfirmed = Platform.OS === 'web' 
+      ? window.confirm("Are you sure you want to save these changes?")
+      : await new Promise(resolve => {
+          Alert.alert(
+            "Save Changes",
+            "Are you sure you want to save these changes?",
+            [
+              { text: "Cancel", style: "cancel", onPress: () => resolve(false) },
+              {
+                text: "Save",
+                style: "default",
+                onPress: () => resolve(true),
+              },
+            ],
+            { cancelable: false }
+          );
+        });
+
+    if (saveConfirmed) {
+      setIsSaving(true);
+      try {
+        const jobId = id as string;
+        await updateJob(jobId, {
+          title,
+          description,
+          location,
+          salary,
+          image,
+        });
+
+        if (Platform.OS === 'web') {
+          window.alert("Job updated successfully!");
+          router.replace('/(dashboard)/jobs');
+        } else {
+          Alert.alert("Success", "Job updated successfully!", [
+            { text: "OK", onPress: () => router.replace('/(dashboard)/jobs') }
+          ]);
+        }
+      } catch (e) {
+        Alert.alert("Error", "Failed to update job");
+      }
+      setIsSaving(false);
     }
-    setIsSaving(false);
   };
 
   if (loading) {
