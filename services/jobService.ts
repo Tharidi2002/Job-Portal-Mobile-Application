@@ -1,3 +1,4 @@
+// Job Portal: Job service logic extracted from mealService.ts
 import { db } from "../firebase";
 import {
   collection,
@@ -6,80 +7,96 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  getDoc, 
-  query,
-  where,
+  getDoc,
 } from "firebase/firestore";
-import { getUserProfile, UserProfile } from "./userService";
 
-export interface Job {
-  id: string;
+export type Job = {
+  id?: string;
+  companyId: string;
   title: string;
   description: string;
   location: string;
-  companyId: string;
-  companyName?: string;
-  companyLogo?: string;
-  salary?: number;
-}
+  salary?: string;
+  logo?: string;
+  image?: string;
+  createdAt?: any;
+  updatedAt?: any;
+};
 
-const jobCollection = collection(db, "jobs");
+export const jobColRef = collection(db, "jobs");
 
-export const createJob = async (job: Omit<Job, 'id'>) => {
-  const docRef = await addDoc(jobCollection, job);
+export const createJob = async (job: Omit<Job, "id">) => {
+  const docRef = await addDoc(jobColRef, {
+    ...job,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   return docRef.id;
 };
 
-export const getJobs = async (companyId?: string): Promise<Job[]> => {
-  let q = query(jobCollection);
-  if (companyId) {
-    q = query(jobCollection, where("companyId", "==", companyId));
-  }
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) {
-    return [];
-  }
-
-  const jobs = await Promise.all(
-    snapshot.docs.map(async (doc) => {
-      const job = { ...doc.data(), id: doc.id } as Job;
-      if (job.companyId) {
-        const companyProfile = await getUserProfile(job.companyId);
-        if (companyProfile) {
-          job.companyName = companyProfile.companyName;
-          job.companyLogo = companyProfile.logo;
-        }
-      }
-      return job;
-    })
-  );
-
-  return jobs;
+export const getJobs = async () => {
+  const snapshot = await getDocs(jobColRef);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as Job) }));
 };
 
-export const getJobById = async (jobId: string): Promise<Job | null> => {
-  const jobDoc = doc(db, "jobs", jobId);
-  const docSnap = await getDoc(jobDoc);
-  if (docSnap.exists()) {
-    const job = { ...docSnap.data(), id: docSnap.id } as Job;
-    if (job.companyId) {
-      const companyProfile = await getUserProfile(job.companyId);
-      if (companyProfile) {
-        job.companyName = companyProfile.companyName;
-        job.companyLogo = companyProfile.logo;
-      }
-    }
-    return job;
+export const getJobById = async (id: string) => {
+  const docRef = doc(db, "jobs", id);
+  const jobSnap = await getDoc(docRef);
+  if (jobSnap.exists()) {
+    return { id: jobSnap.id, ...jobSnap.data() };
   }
   return null;
 };
 
-export const updateJob = async (jobId: string, updates: Partial<Job>) => {
-  const jobDoc = doc(db, "jobs", jobId);
-  await updateDoc(jobDoc, updates);
+export const updateJob = async (id: string, job: Partial<Job>) => {
+  const docRef = doc(db, "jobs", id);
+  await updateDoc(docRef, { ...job, updatedAt: new Date() });
 };
 
-export const deleteJob = async (jobId: string) => {
-  const jobDoc = doc(db, "jobs", jobId);
-  await deleteDoc(jobDoc);
+export const deleteJob = async (id: string) => {
+  const docRef = doc(db, "jobs", id);
+  await deleteDoc(docRef);
+};
+
+export const uploadImageToCloudinary = async (imageUri: string) => {
+  try {
+    if (!imageUri || typeof imageUri !== "string") {
+      console.error("Invalid image URI:", imageUri);
+      return null;
+    }
+    const data = new FormData();
+    data.append("file", {
+      uri: imageUri,
+      type: "image/jpeg",
+      name: "upload.jpg",
+    } as any);
+    data.append("upload_preset", "my_preset");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dfwzzxgja/image/upload",
+        {
+          method: "POST",
+          body: data,
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Cloudinary upload failed:", errorText);
+        return null;
+      }
+      const result = await res.json();
+      return result.secure_url;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.error("Cloudinary upload error:", err);
+      return null;
+    }
+  } catch (err) {
+    console.error("Cloudinary upload error:", err);
+    return null;
+  }
 };

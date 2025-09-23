@@ -80,8 +80,5 @@
   "private": true,
   "engines": {
     "node": ">=20.0.0"
-  },
-  "overrides": {
-    "lightningcss": "1.22.0"
   }
 }

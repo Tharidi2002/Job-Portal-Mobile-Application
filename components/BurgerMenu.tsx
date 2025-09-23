@@ -1,57 +1,41 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
-import { useRouter } from "expo-router";
+
+interface MenuItem {
+  label: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  onPress: () => void | Promise<void>;
+}
+
+interface BurgerMenuProps {
+  title: string;
+  menuItems: MenuItem[];
+}
 
 const { width } = Dimensions.get("window");
 
-const BurgerMenu: React.FC<{ title: string }> = ({ title }) => {
+const BurgerMenu: React.FC<BurgerMenuProps> = ({ title, menuItems }) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const { user, signOut } = useAuth();
-  const { colors } = useTheme();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/(unauth)/"); 
-  };
-
-  const unauthMenuItems = [
-    { label: "All Jobs", icon: "home" as const, onPress: () => router.push("/(unauth)/") },
-    { label: "All Companies", icon: "business" as const, onPress: () => router.push("/(unauth)/companies") },
-    { label: "About", icon: "info" as const, onPress: () => router.push("/(unauth)/about") },
-    { label: "Login", icon: "login" as const, onPress: () => router.push("/(auth)/login") },
-    { label: "Sign Up", icon: "person-add" as const, onPress: () => router.push("/(auth)/signup") },
-  ];
-
-  const authMenuItems = [
-    { label: "Dashboard", icon: "dashboard" as const, onPress: () => router.push("/(dashboard)/home") },
-    { label: "My Profile", icon: "person" as const, onPress: () => router.push("/(dashboard)/profile") },
-    { label: "Post a Job", icon: "add-to-photos" as const, onPress: () => router.push("/(dashboard)/jobs/new") },
-    { label: "Logout", icon: "logout" as const, onPress: handleSignOut },
-  ];
-
-  const menuItems = user ? authMenuItems : unauthMenuItems;
 
   return (
     <>
-      <View style={[styles.topBar, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+      {/* Top Bar with Burger Button */}
+      <View style={styles.topBar}>
         <TouchableOpacity onPress={() => setMenuOpen(!menuOpen)} style={styles.burgerButton}>
-          <MaterialIcons name="menu" size={32} color={colors.text} />
+          <MaterialIcons name="menu" size={32} color="#222" />
         </TouchableOpacity>
-        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+        <Text style={styles.title}>{title}</Text>
       </View>
-      
+      {/* Dropdown Menu Overlay */}
       {menuOpen && (
         <TouchableOpacity
           style={styles.menuOverlay}
           activeOpacity={1}
           onPress={() => setMenuOpen(false)}
         >
-          <View style={[styles.menu, { backgroundColor: colors.card }]}>
-            {menuItems.map((item) => (
+          <View style={styles.menu}>
+            {menuItems.map((item, idx) => (
               <TouchableOpacity
                 key={item.label}
                 style={styles.menuItem}
@@ -60,8 +44,8 @@ const BurgerMenu: React.FC<{ title: string }> = ({ title }) => {
                   await item.onPress();
                 }}
               >
-                <MaterialIcons name={item.icon} size={20} color={colors.text} />
-                <Text style={[styles.menuText, { color: colors.text }]}>{item.label}</Text>
+                <MaterialIcons name={item.icon} size={20} color="#222" />
+                <Text style={styles.menuText}>{item.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -76,15 +60,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 40,
+    paddingBottom: 8,
     borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    backgroundColor: "#f9f9f9",
+    zIndex: 2,
   },
   burgerButton: {
     marginRight: 16,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
+    flex: 1,
   },
   menuOverlay: {
     position: "absolute",
@@ -92,30 +81,33 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.1)",
-    zIndex: 100,
+    backgroundColor: "rgba(0,0,0,0.08)",
+    zIndex: 20,
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
   menu: {
-    position: 'absolute',
-    top: 60, 
-    left: 16,
-    width: width * 0.7,
+    marginTop: 70,
+    width: width - 32,
+    backgroundColor: "#fff",
     borderRadius: 12,
-    elevation: 8,
+    elevation: 6,
     shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
+    shadowOpacity: 0.13,
+    shadowRadius: 12,
     paddingVertical: 8,
+    zIndex: 30,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 20,
   },
   menuText: {
-    marginLeft: 15,
+    marginLeft: 12,
     fontSize: 16,
+    color: "#222",
   },
 });
 

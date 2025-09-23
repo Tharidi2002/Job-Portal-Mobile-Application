@@ -21,16 +21,11 @@ const Register = () => {
   const [password, setPassword] = React.useState<string>("");
   const [confirmPassword, setConfirmPassword] = React.useState<string>("");
   const [companyName, setCompanyName] = React.useState<string>("");
-  const [companyWebsite, setCompanyWebsite] = React.useState<string>("");
-  const [companyIndustry, setCompanyIndustry] = React.useState<string>("");
-  const [companyDescription, setCompanyDescription] = React.useState<string>("");
-  const [contactPhone, setContactPhone] = React.useState<string>("");
   const [logo, setLogo] = React.useState<string>("");
   const [logoError, setLogoError] = React.useState<string>("");
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
   // Image picker handler
   const pickLogo = async () => {
     setLogoError("");
@@ -71,13 +66,9 @@ const Register = () => {
         email: user.email || email,
         companyName,
         logo: logo || "",
-        companyWebsite: companyWebsite || "",
-        companyIndustry: companyIndustry || "",
-        companyDescription: companyDescription || "",
-        contactPhone: contactPhone || "",
         createdAt: new Date().toISOString(),
       });
-      router.replace("/(auth)/dashboard");
+      router.replace("/home");
     } catch (err) {
       alert("Registration Failed");
       console.error("Registration Error:", err);
@@ -136,74 +127,6 @@ const Register = () => {
             }}
           />
         </View>
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 10, marginBottom: 14, borderWidth: 1, borderColor: '#e0e7ff' }}>
-            <Text style={{ fontSize: 18, color: '#6366f1', marginLeft: 12 }}>🌐</Text>
-            <TextInput
-                placeholder="Company Website"
-                placeholderTextColor="#94a3b8"
-                value={companyWebsite}
-                onChangeText={setCompanyWebsite}
-                style={{
-                padding: 14,
-                fontSize: 16,
-                backgroundColor: 'transparent',
-                flex: 1,
-                }}
-            />
-        </View>
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 10, marginBottom: 14, borderWidth: 1, borderColor: '#e0e7ff' }}>
-            <Text style={{ fontSize: 18, color: '#6366f1', marginLeft: 12 }}>📈</Text>
-            <TextInput
-                placeholder="Company Industry"
-                placeholderTextColor="#94a3b8"
-                value={companyIndustry}
-                onChangeText={setCompanyIndustry}
-                style={{
-                padding: 14,
-                fontSize: 16,
-                backgroundColor: 'transparent',
-                flex: 1,
-                }}
-            />
-        </View>
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 10, marginBottom: 14, borderWidth: 1, borderColor: '#e0e7ff' }}>
-            <Text style={{ fontSize: 18, color: '#6366f1', marginLeft: 12 }}>ℹ️</Text>
-            <TextInput
-                placeholder="Company Description"
-                placeholderTextColor="#94a3b8"
-                value={companyDescription}
-                onChangeText={setCompanyDescription}
-                multiline
-                style={{
-                padding: 14,
-                fontSize: 16,
-                backgroundColor: 'transparent',
-                flex: 1,
-                minHeight: 80,
-                }}
-            />
-        </View>
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 10, marginBottom: 14, borderWidth: 1, borderColor: '#e0e7ff' }}>
-            <Text style={{ fontSize: 18, color: '#6366f1', marginLeft: 12 }}>📞</Text>
-            <TextInput
-                placeholder="Contact Phone"
-                placeholderTextColor="#94a3b8"
-                value={contactPhone}
-                onChangeText={setContactPhone}
-                keyboardType="phone-pad"
-                style={{
-                padding: 14,
-                fontSize: 16,
-                backgroundColor: 'transparent',
-                flex: 1,
-                }}
-            />
-        </View>
-
         <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 10, marginBottom: 14, borderWidth: 1, borderColor: '#e0e7ff' }}>
           <Text style={{ fontSize: 18, color: '#6366f1', marginLeft: 12 }}>✉️</Text>
           <TextInput
