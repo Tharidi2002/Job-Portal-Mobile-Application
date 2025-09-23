@@ -1,7 +1,7 @@
 import { View, SafeAreaView, ActivityIndicator, Dimensions } from "react-native";
 import BurgerMenu from "../../components/BurgerMenu";
 import React, { useEffect } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, Slot } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -76,12 +76,11 @@ const DashboardLayout = () => {
         menuItems={[
           { label: "Home", icon: "home", onPress: () => router.push("/(dashboard)/home") },
           { label: "Profile", icon: "person", onPress: () => router.push("/(dashboard)/profile") },
-          { label: "Page", icon: "post-add", onPress: () => router.push("/(dashboard)/page") },
-          { label: "Settings", icon: "settings", onPress: () => router.push("/(dashboard)/settings") },
+          { label: "Companies", icon: "business", onPress: () => router.push("/(dashboard)/companies") },
           { label: "Logout", icon: "logout", onPress: async () => { try { await signOut(); router.replace("/(auth)/login"); } catch (e) {} } },
         ]}
       />
-      {/* Add children screens here if needed */}
+      <Slot />
     </SafeAreaView>
   );
 };

@@ -25,6 +25,7 @@ export default function CompanyProfileScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   // Company fields
   const [companyName, setCompanyName] = useState("");
   const [logo, setLogo] = useState("");
@@ -51,7 +52,10 @@ export default function CompanyProfileScreen() {
         }
         if (userProfile) {
           setProfile(userProfile);
+          setCompanyName(userProfile.companyName || "");
+          setLogo(userProfile.logo || "");
           setLocation(userProfile.location || "");
+          setCeoName(userProfile.ceoName || "");
           setDescription(userProfile.description || "");
           setPhone(userProfile.phone || "");
           setGallery(userProfile.gallery || []);
@@ -123,7 +127,15 @@ export default function CompanyProfileScreen() {
   };
   const handleCancel = () => {
     // Reset form fields to original values
-    setPhone(profile?.phone || "");
+    if (profile) {
+      setCompanyName(profile.companyName || "");
+      setLogo(profile.logo || "");
+      setLocation(profile.location || "");
+      setCeoName(profile.ceoName || "");
+      setDescription(profile.description || "");
+      setPhone(profile.phone || "");
+      setGallery(profile.gallery || []);
+    }
     setIsEditing(false);
   };
 
