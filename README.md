@@ -1,6 +1,6 @@
 # Job Portal App
 
-![App Icon](https://github.com/user-attachments/assets/ccc14001-ef63-43f5-a0d9-64db22ca1957)
+<img src="https://github.com/user-attachments/assets/ccc14001-ef63-43f5-a0d9-64db22ca1957" alt="App Icon" width="150"/>
 
 A mobile-first job portal application built with Expo and React Native.
 
@@ -47,19 +47,19 @@ You can download and install the latest build of the application here:
 
 | Login | Registration |
 | :---: | :---: |
-| ![Login Page](https://github.com/user-attachments/assets/a7496b96-596d-445d-8e6c-4f1a721f6813) | ![Register PAge](https://github.com/user-attachments/assets/0d66d594-8c2e-4819-b8de-f0c1ea03db48) |
+| <img src="https://github.com/user-attachments/assets/a7496b96-596d-445d-8e6c-4f1a721f6813" alt="Login Page" width="300"/> | <img src="https://github.com/user-attachments/assets/0d66d594-8c2e-4819-b8de-f0c1ea03db48" alt="Register PAge" width="300"/> |
 
 | Dashboard Navigation | Job Calendar |
 | :---: | :---: |
-| ![Dashboard Navigation](https://github.com/user-attachments/assets/ecb9a5ec-efc3-4d33-84f7-5c25275a4e52) | ![Job Calendar](https://github.com/user-attachments/assets/98b0c008-8c87-4c2c-abbf-a7ab253be69c) |
+| <img src="https://github.com/user-attachments/assets/ecb9a5ec-efc3-4d33-84f7-5c25275a4e52" alt="Dashboard Navigation" width="300"/> | <img src="https://github.com/user-attachments/assets/98b0c008-8c87-4c2c-abbf-a7ab253be69c" alt="Job Calendar" width="300"/> |
 
 | My Job Postings | All Companies |
 | :---: | :---: |
-| ![My Job Postings](https://github.com/user-attachments/assets/c3f340d3-9353-480c-aceb-95e3f06d22fb) | ![All Companies](https://github.com/user-attachments/assets/d103fc30-14bc-403a-b765-a867b7185fa5) |
+| <img src="https://github.com/user-attachments/assets/c3f340d3-9353-480c-aceb-95e3f06d22fb" alt="My Job Postings" width="300"/> | <img src="https://github.com/user-attachments/assets/d103fc30-14bc-403a-b765-a867b7185fa5" alt="All Companies" width="300"/> |
 
 | Company Profile |
 | :---: |
-| ![Company Profile](https://github.com/user-attachments/assets/f4455e62-b424-47f1-ace3-eaa6aeadfae4) |
+| <img src="https://github.com/user-attachments/assets/f4455e62-b424-47f1-ace3-eaa6aeadfae4" alt="Company Profile" width="300"/> |
 
 ## Getting Started with Development
 
