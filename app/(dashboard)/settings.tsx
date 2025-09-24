@@ -6,16 +6,15 @@ import {
   TouchableOpacity,
   Alert,
   Switch,
-  Linking,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
-import { getUserProfile } from "../../services/userService";
+import { getUserProfile, deleteUserProfile } from "../../services/userService";
 
 export default function SettingsScreen() {
-  const { colors, isDark, toggleTheme } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -34,6 +33,7 @@ export default function SettingsScreen() {
     loadProfile();
   }, [user]);
 
+  // --- Logout
   const handleLogout = () => {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
@@ -43,8 +43,8 @@ export default function SettingsScreen() {
         onPress: async () => {
           try {
             await signOut();
-            router.replace("/login");
-          } catch (error) {
+            router.replace("/(auth)/login");
+          } catch {
             Alert.alert("Error", "Failed to sign out");
           }
         },
@@ -52,14 +52,62 @@ export default function SettingsScreen() {
     ]);
   };
 
-  const openURL = async (url: string) => {
-    try {
-      await Linking.openURL(url);
-    } catch (error) {
-      Alert.alert("Error", "Failed to open link");
-    }
-  };
+  // --- Delete Profile
+  // const handleDeleteProfile = () => {
+  //   Alert.alert(
+  //     "Delete Account",
+  //     "This will permanently delete your profile and all job data. Do you want to continue?",
+  //     [
+  //       { text: "Cancel", style: "cancel" },
+  //       {
+  //         text: "Delete",
+  //         style: "destructive",
+  //         onPress: async () => {
+  //           try {
+  //             if (user) {
+  //               await deleteUserProfile(user.uid);
+  //             }
+  //             await signOut();
+  //             router.replace("/(auth)/login");
+  //           } catch {
+  //             Alert.alert("Error", "Failed to delete account");
+  //           }
+  //         },
+  //       },
+  //     ]
+  //   );
+  // };
+  const handleDeleteProfile = () => {
+  Alert.alert(
+    "Delete Account",
+    "This will permanently delete your profile and all job data. Do you want to continue?",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            // TODO: Add delete logic here (e.g., call deleteUserProfile(user.uid))
+            // Example:
+            // if (user) {
+            //   await deleteUserProfile(user.uid);
+            // }
 
+            // For now, just sign out and navigate to login
+            await signOut();
+            router.replace("/(auth)/login");
+          } catch (error) {
+            Alert.alert("Error", "Failed to delete account");
+          }
+        },
+      },
+    ]
+  );
+};
+
+
+  // --- Reusable Section
   const SettingsSection = ({
     title,
     children,
@@ -67,33 +115,17 @@ export default function SettingsScreen() {
     title: string;
     children: React.ReactNode;
   }) => (
-    <View style={{ marginBottom: 24 }}>
-      <Text
-        style={{
-          fontSize: 16,
-          fontWeight: "600",
-          color: colors.textSecondary,
-          marginBottom: 12,
-          paddingHorizontal: 16,
-          textTransform: "uppercase",
-          letterSpacing: 0.5,
-        }}
-      >
+    <View className="mb-6">
+      <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-4 uppercase tracking-wide">
         {title}
       </Text>
-      <View
-        style={{
-          backgroundColor: colors.card,
-          marginHorizontal: 16,
-          borderRadius: 12,
-          overflow: "hidden",
-        }}
-      >
+      <View className="bg-white dark:bg-gray-800 mx-4 rounded-xl overflow-hidden">
         {children}
       </View>
     </View>
   );
 
+  // --- Reusable Item
   const SettingsItem = ({
     icon,
     title,
@@ -105,47 +137,21 @@ export default function SettingsScreen() {
   }: any) => (
     <TouchableOpacity
       onPress={onPress}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 16,
-        borderBottomWidth: isLast ? 0 : 1,
-        borderBottomColor: colors.border,
-      }}
       disabled={!onPress}
+      className={`flex-row items-center p-4 ${
+        isLast ? "" : "border-b border-gray-200 dark:border-gray-700"
+      }`}
     >
-      <View
-        style={{
-          backgroundColor: colors.primary,
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          justifyContent: "center",
-          alignItems: "center",
-          marginRight: 16,
-        }}
-      >
+      <View className="bg-blue-500 w-10 h-10 rounded-full justify-center items-center mr-4">
         <MaterialIcons name={icon} size={20} color="white" />
       </View>
 
-      <View style={{ flex: 1 }}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: "500",
-            color: colors.text,
-            marginBottom: subtitle ? 2 : 0,
-          }}
-        >
+      <View className="flex-1">
+        <Text className="text-base font-medium text-gray-900 dark:text-gray-100">
           {title}
         </Text>
         {subtitle && (
-          <Text
-            style={{
-              fontSize: 14,
-              color: colors.textSecondary,
-            }}
-          >
+          <Text className="text-sm text-gray-500 dark:text-gray-400">
             {subtitle}
           </Text>
         )}
@@ -156,60 +162,25 @@ export default function SettingsScreen() {
           <MaterialIcons
             name="chevron-right"
             size={24}
-            color={colors.textSecondary}
+            color={isDark ? "gray" : "gray"}
           />
         ))}
     </TouchableOpacity>
   );
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
+    <ScrollView className="flex-1 bg-gray-50 dark:bg-black">
       {/* Header */}
-      <View
-        style={{
-          padding: 16,
-          paddingTop: 24,
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: 40,
-            backgroundColor: colors.primary,
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          {userProfile?.profileImage ? (
-            // TODO: Add Image component when available
-            <MaterialIcons name="person" size={40} color="white" />
-          ) : (
-            <MaterialIcons name="person" size={40} color="white" />
-          )}
+      <View className="p-6 items-center">
+        <View className="w-20 h-20 rounded-full bg-blue-500 justify-center items-center mb-4">
+          <MaterialIcons name="person" size={40} color="white" />
         </View>
-
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: colors.text,
-            marginBottom: 4,
-          }}
-        >
+        <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
           {userProfile?.firstName && userProfile?.lastName
             ? `${userProfile.firstName} ${userProfile.lastName}`
-            : "User"}
+            : "Company"}
         </Text>
-
-        <Text
-          style={{
-            fontSize: 16,
-            color: colors.textSecondary,
-          }}
-        >
+        <Text className="text-base text-gray-500 dark:text-gray-400">
           {user?.email}
         </Text>
       </View>
@@ -244,8 +215,8 @@ export default function SettingsScreen() {
             <Switch
               value={isDark}
               onValueChange={toggleTheme}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={isDark ? "white" : colors.textSecondary}
+              trackColor={{ false: "#d1d5db", true: "#3b82f6" }}
+              thumbColor={isDark ? "white" : "#9ca3af"}
             />
           }
           showChevron={false}
@@ -253,7 +224,7 @@ export default function SettingsScreen() {
         <SettingsItem
           icon="notifications"
           title="Notifications"
-          subtitle="Manage meal reminders and updates"
+          subtitle="Manage job alerts and updates"
           onPress={() => router.push("/notifications" as any)}
         />
         <SettingsItem
@@ -272,18 +243,18 @@ export default function SettingsScreen() {
         <SettingsItem
           icon="backup"
           title="Backup & Sync"
-          subtitle="Your data is automatically backed up"
+          subtitle="Your job data is automatically backed up"
           onPress={() =>
             Alert.alert(
               "Backup Status",
-              "Your meal data is safely stored in the cloud"
+              "Your job application data is safely stored in the cloud"
             )
           }
         />
         <SettingsItem
           icon="storage"
           title="Storage Usage"
-          subtitle="Manage your meal photos and data"
+          subtitle="Manage saved resumes and documents"
           onPress={() =>
             Alert.alert("Coming Soon", "This feature will be available soon")
           }
@@ -291,7 +262,7 @@ export default function SettingsScreen() {
         <SettingsItem
           icon="download"
           title="Export Data"
-          subtitle="Download your meal data"
+          subtitle="Download your job application data"
           onPress={() =>
             Alert.alert("Coming Soon", "This feature will be available soon")
           }
@@ -308,18 +279,18 @@ export default function SettingsScreen() {
           onPress={() =>
             Alert.alert(
               "Help",
-              "For support, please contact us at support@mealmate.com"
+              "For support, please contact us at support@jobportal.com"
             )
           }
         />
         <SettingsItem
           icon="feedback"
           title="Send Feedback"
-          subtitle="Help us improve MealMate"
+          subtitle="Help us improve Job Portal"
           onPress={() =>
             Alert.alert(
               "Feedback",
-              "Thank you for using MealMate! Please send your feedback to feedback@mealmate.com"
+              "Thank you for using Job Portal! Send feedback to feedback@jobportal.com"
             )
           }
         />
@@ -329,81 +300,55 @@ export default function SettingsScreen() {
           subtitle="Share your experience"
           onPress={() =>
             Alert.alert(
-              "Rate MealMate",
+              "Rate Job Portal",
               "Thank you for your support! Please rate us on the app store."
             )
           }
         />
         <SettingsItem
           icon="info"
-          title="About MealMate"
+          title="About Job Portal"
           subtitle="Version 1.0.0"
           onPress={() =>
             Alert.alert(
-              "About MealMate",
-              "MealMate v1.0.0\n\nYour personal meal planning companion.\n\nDeveloped with ❤️ for food lovers."
+              "About Job Portal",
+              "Job Portal v1.0.0\n\nYour career companion.\n\nDeveloped with ❤️ for job seekers and recruiters."
             )
           }
           isLast
         />
       </SettingsSection>
 
-      {/* Sign Out */}
-      <View style={{ marginHorizontal: 16, marginBottom: 32 }}>
+      {/* Sign Out & Delete */}
+      <View className="mx-4 mb-8">
         <TouchableOpacity
           onPress={handleLogout}
-          style={{
-            backgroundColor: colors.error,
-            paddingVertical: 16,
-            paddingHorizontal: 24,
-            borderRadius: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className="bg-red-500 py-4 px-6 rounded-xl flex-row items-center justify-center mb-3"
         >
           <MaterialIcons name="logout" size={20} color="white" />
-          <Text
-            style={{
-              color: "white",
-              fontSize: 16,
-              fontWeight: "600",
-              marginLeft: 8,
-            }}
-          >
+          <Text className="text-white text-base font-semibold ml-2">
             Sign Out
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleDeleteProfile}
+          className="bg-red-700 py-4 px-6 rounded-xl flex-row items-center justify-center"
+        >
+          <MaterialIcons name="delete" size={20} color="white" />
+          <Text className="text-white text-base font-semibold ml-2">
+            Delete Profile
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Footer */}
-      <View
-        style={{
-          padding: 16,
-          alignItems: "center",
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
-          marginTop: 16,
-        }}
-      >
-        <Text
-          style={{
-            color: colors.textSecondary,
-            fontSize: 12,
-            textAlign: "center",
-            marginBottom: 8,
-          }}
-        >
-          MealMate - Your Personal Meal Planning Companion
+      <View className="p-4 items-center border-t border-gray-200 dark:border-gray-700 mt-4">
+        <Text className="text-gray-500 dark:text-gray-400 text-xs text-center mb-1">
+          Job Portal - Your Career Companion
         </Text>
-        <Text
-          style={{
-            color: colors.textSecondary,
-            fontSize: 10,
-            textAlign: "center",
-          }}
-        >
-          Made with ❤️ for food enthusiasts
+        <Text className="text-gray-500 dark:text-gray-400 text-[10px] text-center">
+          Made with for job seekers & employers
         </Text>
       </View>
     </ScrollView>
