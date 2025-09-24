@@ -10,6 +10,8 @@ import {
   ScrollView,
   ActivityIndicator,
   FlatList,
+  SafeAreaView,
+  Platform,
 } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -19,9 +21,11 @@ import {
   UserProfile,
 } from "@/services/userService";
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 
 export default function CompanyProfileScreen() {
   const { user, signOut } = useAuth();
+  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -139,342 +143,398 @@ export default function CompanyProfileScreen() {
     setIsEditing(false);
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: () => {
+            if (typeof signOut === "function") signOut();
+            router.replace("/(auth)/login");
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#fff",
+        }}
+      >
         <ActivityIndicator size="large" />
         <Text>Loading company profile...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView style={{ flex: 1, padding: 20 }}>
-      <View style={{ alignItems: "center", marginBottom: 20 }}>
-        <TouchableOpacity onPress={isEditing ? pickLogo : undefined}>
-          {logo ? (
-            <Image
-              source={{ uri: logo }}
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                marginBottom: 10,
-              }}
-            />
-          ) : (
-            <View
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                backgroundColor: "#e0e0e0",
-                justifyContent: "center",
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <Text style={{ color: "#666" }}>No Logo</Text>
-            </View>
-          )}
-          {isEditing && (
-            <Text style={{ textAlign: "center", color: "#007AFF" }}>
-              Tap to change logo
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          Company Name
-        </Text>
-        {isEditing ? (
-          <TextInput
-            value={companyName}
-            onChangeText={setCompanyName}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              padding: 10,
-              borderRadius: 8,
-              fontSize: 16,
-            }}
-            placeholder="Enter company name"
-          />
-        ) : (
-          <Text
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: "#f5f5f5",
-              borderRadius: 8,
-            }}
-          >
-            {profile?.companyName || "Not set"}
-          </Text>
-        )}
-      </View>
-
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          Email
-        </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            padding: 10,
-            backgroundColor: "#f5f5f5",
-            borderRadius: 8,
-            color: "#666",
-          }}
-        >
-          {user?.email}
-        </Text>
-      </View>
-
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          Location
-        </Text>
-        {isEditing ? (
-          <TextInput
-            value={location}
-            onChangeText={setLocation}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              padding: 10,
-              borderRadius: 8,
-              fontSize: 16,
-            }}
-            placeholder="Enter company location"
-          />
-        ) : (
-          <Text
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: "#f5f5f5",
-              borderRadius: 8,
-            }}
-          >
-            {profile?.location || "Not set"}
-          </Text>
-        )}
-      </View>
-
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          CEO Name
-        </Text>
-        {isEditing ? (
-          <TextInput
-            value={ceoName}
-            onChangeText={setCeoName}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              padding: 10,
-              borderRadius: 8,
-              fontSize: 16,
-            }}
-            placeholder="Enter CEO name"
-          />
-        ) : (
-          <Text
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: "#f5f5f5",
-              borderRadius: 8,
-            }}
-          >
-            {profile?.ceoName || "Not set"}
-          </Text>
-        )}
-      </View>
-
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          Phone
-        </Text>
-        {isEditing ? (
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              padding: 10,
-              borderRadius: 8,
-              fontSize: 16,
-            }}
-            placeholder="Enter phone number"
-          />
-        ) : (
-          <Text
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: "#f5f5f5",
-              borderRadius: 8,
-            }}
-          >
-            {profile?.phone || "Not set"}
-          </Text>
-        )}
-      </View>
-
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          Description
-        </Text>
-        {isEditing ? (
-          <TextInput
-            value={description}
-            onChangeText={setDescription}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ccc",
-              padding: 10,
-              borderRadius: 8,
-              fontSize: 16,
-              height: 100,
-              textAlignVertical: "top",
-            }}
-            placeholder="Describe your company"
-            multiline
-          />
-        ) : (
-          <Text
-            style={{
-              fontSize: 16,
-              padding: 10,
-              backgroundColor: "#f5f5f5",
-              borderRadius: 8,
-              minHeight: 100,
-            }}
-          >
-            {profile?.description || "No description added"}
-          </Text>
-        )}
-      </View>
-
-      {/* Gallery Section */}
-      <View style={{ marginBottom: 30 }}>
-        <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
-          Company Gallery
-        </Text>
-        <FlatList
-          data={gallery}
-          horizontal
-          keyExtractor={(_, idx) => idx.toString()}
-          renderItem={({ item, index }) => (
-            <View style={{ marginRight: 10, position: "relative" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: "#fff",
+        paddingTop: Platform.OS === "android" ? 25 : 0,
+      }}
+    >
+      <ScrollView
+        style={{ flex: 1, paddingHorizontal: 20 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={{ alignItems: "center", marginBottom: 20 }}>
+          <TouchableOpacity onPress={isEditing ? pickLogo : undefined}>
+            {logo ? (
               <Image
-                source={{ uri: item }}
-                style={{ width: 80, height: 80, borderRadius: 8 }}
+                source={{ uri: logo }}
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 60,
+                  marginBottom: 10,
+                }}
               />
-              {isEditing && (
-                <TouchableOpacity
-                  onPress={() => removeGalleryImage(index)}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    backgroundColor: "#FF3B30",
-                    borderRadius: 10,
-                    padding: 2,
-                  }}
-                >
-                  <Text style={{ color: "white", fontSize: 12 }}>X</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-          ListEmptyComponent={
-            <Text style={{ color: "#888" }}>
-              {isEditing ? "No images. Add some!" : "No images uploaded."}
-            </Text>
-          }
-        />
-        {isEditing && (
-          <TouchableOpacity
-            onPress={addGalleryImage}
-            style={{
-              backgroundColor: "#007AFF",
-              padding: 10,
-              borderRadius: 8,
-              marginTop: 10,
-              alignSelf: "flex-start",
-            }}
-          >
-            <Text style={{ color: "white" }}>Add Image</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {isEditing ? (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginBottom: 20,
-          }}
-        >
-          <TouchableOpacity
-            onPress={handleCancel}
-            style={{
-              backgroundColor: "#ccc",
-              padding: 15,
-              borderRadius: 8,
-              flex: 1,
-              marginRight: 10,
-            }}
-            disabled={isSaving}
-          >
-            <Text style={{ textAlign: "center", fontSize: 16 }}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSave}
-            style={{
-              backgroundColor: "#007AFF",
-              padding: 15,
-              borderRadius: 8,
-              flex: 1,
-              marginLeft: 10,
-            }}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text
-                style={{ textAlign: "center", fontSize: 16, color: "white" }}
+              <View
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 60,
+                  backgroundColor: "#e0e0e0",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: 10,
+                }}
               >
-                Save
+                <Text style={{ color: "#666" }}>No Logo</Text>
+              </View>
+            )}
+            {isEditing && (
+              <Text style={{ textAlign: "center", color: "#007AFF" }}>
+                Tap to change logo
               </Text>
             )}
           </TouchableOpacity>
         </View>
-      ) : (
-        <TouchableOpacity
-          onPress={() => setIsEditing(true)}
-          style={{
-            backgroundColor: "#007AFF",
-            padding: 15,
-            borderRadius: 8,
-            marginBottom: 20,
-          }}
-        >
-          <Text style={{ textAlign: "center", fontSize: 16, color: "white" }}>
-            Edit Company Profile
-          </Text>
-        </TouchableOpacity>
-      )}
 
-      <Button title="Logout" onPress={signOut} color="#FF3B30" />
-    </ScrollView>
+        <View style={{ marginBottom: 20 }}>
+          <Text
+            style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}
+          >
+            Company Name
+          </Text>
+          {isEditing ? (
+            <TextInput
+              value={companyName}
+              onChangeText={setCompanyName}
+              style={{
+                borderWidth: 1,
+                borderColor: "#ccc",
+                padding: 10,
+                borderRadius: 8,
+                fontSize: 16,
+              }}
+              placeholder="Enter company name"
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: "#f5f5f5",
+                borderRadius: 8,
+              }}
+            >
+              {profile?.companyName || "Not set"}
+            </Text>
+          )}
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
+            Email
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              padding: 10,
+              backgroundColor: "#f5f5f5",
+              borderRadius: 8,
+              color: "#666",
+            }}
+          >
+            {user?.email}
+          </Text>
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
+            Location
+          </Text>
+          {isEditing ? (
+            <TextInput
+              value={location}
+              onChangeText={setLocation}
+              style={{
+                borderWidth: 1,
+                borderColor: "#ccc",
+                padding: 10,
+                borderRadius: 8,
+                fontSize: 16,
+              }}
+              placeholder="Enter company location"
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: "#f5f5f5",
+                borderRadius: 8,
+              }}
+            >
+              {profile?.location || "Not set"}
+            </Text>
+          )}
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
+            CEO Name
+          </Text>
+          {isEditing ? (
+            <TextInput
+              value={ceoName}
+              onChangeText={setCeoName}
+              style={{
+                borderWidth: 1,
+                borderColor: "#ccc",
+                padding: 10,
+                borderRadius: 8,
+                fontSize: 16,
+              }}
+              placeholder="Enter CEO name"
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: "#f5f5f5",
+                borderRadius: 8,
+              }}
+            >
+              {profile?.ceoName || "Not set"}
+            </Text>
+          )}
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
+            Phone
+          </Text>
+          {isEditing ? (
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              style={{
+                borderWidth: 1,
+                borderColor: "#ccc",
+                padding: 10,
+                borderRadius: 8,
+                fontSize: 16,
+              }}
+              placeholder="Enter phone number"
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: "#f5f5f5",
+                borderRadius: 8,
+              }}
+            >
+              {profile?.phone || "Not set"}
+            </Text>
+          )}
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
+            Description
+          </Text>
+          {isEditing ? (
+            <TextInput
+              value={description}
+              onChangeText={setDescription}
+              style={{
+                borderWidth: 1,
+                borderColor: "#ccc",
+                padding: 10,
+                borderRadius: 8,
+                fontSize: 16,
+                height: 100,
+                textAlignVertical: "top",
+              }}
+              placeholder="Describe your company"
+              multiline
+            />
+          ) : (
+            <Text
+              style={{
+                fontSize: 16,
+                padding: 10,
+                backgroundColor: "#f5f5f5",
+                borderRadius: 8,
+                minHeight: 100,
+              }}
+            >
+              {profile?.description || "No description added"}
+            </Text>
+          )}
+        </View>
+
+        {/* Gallery Section */}
+        <View style={{ marginBottom: 30 }}>
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 5 }}>
+            Company Gallery
+          </Text>
+          <FlatList
+            data={gallery}
+            horizontal
+            keyExtractor={(_, idx) => idx.toString()}
+            renderItem={({ item, index }) => (
+              <View style={{ marginRight: 10, position: "relative" }}>
+                <Image
+                  source={{ uri: item }}
+                  style={{ width: 80, height: 80, borderRadius: 8 }}
+                />
+                {isEditing && (
+                  <TouchableOpacity
+                    onPress={() => removeGalleryImage(index)}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      backgroundColor: "#FF3B30",
+                      borderRadius: 10,
+                      padding: 2,
+                    }}
+                  >
+                    <Text style={{ color: "white", fontSize: 12 }}>X</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+            ListEmptyComponent={
+              <Text style={{ color: "#888" }}>
+                {isEditing ? "No images. Add some!" : "No images uploaded."}
+              </Text>
+            }
+          />
+          {isEditing && (
+            <TouchableOpacity
+              onPress={addGalleryImage}
+              style={{
+                backgroundColor: "#007AFF",
+                padding: 10,
+                borderRadius: 8,
+                marginTop: 10,
+                alignSelf: "flex-start",
+              }}
+            >
+              <Text style={{ color: "white" }}>Add Image</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          {isEditing ? (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <TouchableOpacity
+                onPress={handleCancel}
+                style={{
+                  backgroundColor: "#ccc",
+                  padding: 15,
+                  borderRadius: 8,
+                  flex: 1,
+                  marginRight: 10,
+                }}
+                disabled={isSaving}
+              >
+                <Text style={{ textAlign: "center", fontSize: 16 }}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSave}
+                style={{
+                  backgroundColor: "#007AFF",
+                  padding: 15,
+                  borderRadius: 8,
+                  flex: 1,
+                  marginLeft: 10,
+                }}
+                disabled={isSaving}
+              >
+                {isSaving ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text
+                    style={{ textAlign: "center", fontSize: 16, color: "white" }}
+                  >
+                    Save
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setIsEditing(true)}
+              style={{
+                backgroundColor: "#007AFF",
+                padding: 15,
+                borderRadius: 8,
+              }}
+            >
+              <Text style={{ textAlign: "center", fontSize: 16, color: "white" }}>
+                Edit Company Profile
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={{ marginBottom: 20 }}>
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={{
+              backgroundColor: "#FF3B30",
+              padding: 15,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={{ textAlign: "center", fontSize: 16, color: "white" }}>
+              Logout
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
