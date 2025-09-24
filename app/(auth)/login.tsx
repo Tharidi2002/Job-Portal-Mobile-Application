@@ -1,3 +1,60 @@
+
+import { StyleSheet } from "react-native";
+
+const styles = StyleSheet.create({
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 40,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    backgroundColor: "#f9f9f9",
+    zIndex: 2,
+  },
+  burgerButton: {
+    marginRight: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  menuOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.08)',
+    zIndex: 20,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  menuBox: {
+    marginTop: 70,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.13,
+    shadowRadius: 12,
+    paddingVertical: 8,
+    zIndex: 30,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+  },
+  menuText: {
+    marginLeft: 12,
+    fontSize: 16,
+    color: "#222",
+  },
+});
 import {
   View,
   Text,
@@ -55,35 +112,38 @@ const Login = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         {/* Top Bar with Burger Menu */}
-        <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingTop: 40, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: "#eee", backgroundColor: "#f9f9f9", zIndex: 2 }}>
-          <TouchableOpacity onPress={() => setMenuOpen(!menuOpen)} style={{ marginRight: 16 }}>
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={() => setMenuOpen(!menuOpen)} style={styles.burgerButton}>
             <MaterialIcons name="menu" size={32} color="#222" />
           </TouchableOpacity>
-          <Text style={{ fontSize: 24, fontWeight: "bold", flex: 1 }}>Login</Text>
+          <Text style={styles.title}>Login</Text>
         </View>
         {/* Dropdown Menu Overlay */}
         {menuOpen && (
           <TouchableOpacity
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.08)', zIndex: 20, justifyContent: 'flex-start', alignItems: 'center' }}
+            style={styles.menuOverlay}
             activeOpacity={1}
             onPress={() => setMenuOpen(false)}
           >
-            <View style={{ marginTop: 70, width: width - 32, backgroundColor: "#fff", borderRadius: 12, elevation: 6, shadowColor: "#000", shadowOpacity: 0.13, shadowRadius: 12, paddingVertical: 8, zIndex: 30 }}>
-              <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 }} onPress={() => { setMenuOpen(false); router.push("/about"); }}>
+            <View style={[styles.menuBox, { width: width - 32 }]}> 
+              <Text style={{ fontWeight: "bold", fontSize: 16, marginBottom: 8, marginLeft: 8 }}>Navigation</Text>
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); router.push("/about"); }}>
                 <MaterialIcons name="info" size={20} color="#222" />
-                <Text style={{ marginLeft: 12, fontSize: 16, color: "#222" }}>About</Text>
+                <Text style={styles.menuText}>About</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 }} onPress={() => { setMenuOpen(false); router.push("/(auth)/dashboard"); }}>
-                <MaterialIcons name="home" size={20} color="#222" />
-                <Text style={{ marginLeft: 12, fontSize: 16, color: "#222" }}>Home</Text>
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); router.push("/dashboard"); }}>
+                <MaterialIcons name="dashboard" size={20} color="#222" />
+                <Text style={styles.menuText}>Dashboard</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14, paddingHorizontal: 20 }} onPress={() => { setMenuOpen(false); router.push("/(auth)/login"); }}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => { setMenuOpen(false); router.push("/(auth)/login"); }}>
                 <MaterialIcons name="login" size={20} color="#222" />
-                <Text style={{ marginLeft: 12, fontSize: 16, color: "#222" }}>Login</Text>
+                <Text style={styles.menuText}>Login</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
+
+
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"

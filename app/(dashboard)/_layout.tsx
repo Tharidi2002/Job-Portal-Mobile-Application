@@ -77,6 +77,7 @@ const DashboardLayout = () => {
           { label: "Home", icon: "home", onPress: () => router.push("/(dashboard)/home") },
           { label: "Profile", icon: "person", onPress: () => router.push("/(dashboard)/profile") },
           { label: "Post", icon: "business", onPress: () => router.push("/(dashboard)/jobs") },
+          { label: "All Companies", icon: "business", onPress: () => router.push("/(dashboard)/allCompanies") },
           { label: "Logout", icon: "logout", onPress: async () => { try { await signOut(); router.replace("/(auth)/login"); } catch (e) {} } },
         ]}
       />
