@@ -1,11 +1,11 @@
 {
   "expo": {
-  "name": "JOB Portal",
-  "slug": "job-portal",
+    "name": "JOB Portal",
+    "slug": "job-portal",
     "version": "1.0.0",
     "orientation": "portrait",
-  "icon": "./assets/images/icon.png",
-  "scheme": "job-portal",
+    "icon": "./assets/images/icon.png",
+    "scheme": "job-portal",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -31,7 +31,7 @@
         "android.permission.READ_MEDIA_VIDEO",
         "android.permission.READ_MEDIA_AUDIO"
       ],
-      "package": "com.himanthajaga.mealmate"
+      "package": "com.Tharidi2002.jobportal"
     },
     "web": {
       "bundler": "metro",
@@ -52,21 +52,21 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Meal Mate to access your camera to take photos of your meals and scan QR codes."
+          "cameraPermission": "Allow profile to access your camera to take photos of your company and scan QR codes."
         }
       ],
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow Meal Mate to save photos of your meals to your photo library.",
-          "savePhotosPermission": "Allow Meal Mate to save photos of your meals to your photo library.",
+          "photosPermission": "Allow profile to save photos of your company to your photo library.",
+          "savePhotosPermission": "Allow profile to save photos of your company to your photo library.",
           "isAccessMediaLocationEnabled": true
         }
       ],
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/MealMate.png",
+          "icon": "./assets/images/icon.png",
           "color": "#ffffff",
           "defaultChannel": "default"
         }
@@ -78,9 +78,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "d2d86480-7bdf-4896-b74c-69cef223253a"
+        "projectId": "43f3bcde-13f1-4842-b8ca-fa2a6f42bb27"
       }
     },
-    "owner": "himanthajaga"
+    "owner": "tharidi2002"
   }
 }
