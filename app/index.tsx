@@ -19,7 +19,7 @@ const Index = () => {
            if (user) {
                route.push("/home");
            } else {
-               route.push("/about");
+               route.push("/dashboard");
            }
        }
     }, [loading, user]);
